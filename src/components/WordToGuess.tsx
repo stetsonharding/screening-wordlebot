@@ -1,27 +1,37 @@
 import React from "react";
-import { fetchWordleResult, WordleRequest, WordleResponse } from "../api/api";
 
-// function WordToGuess() {
-//     // Call the fetchWordleResult function to load an initial guess
-//     const loadInitialGuess = async () => {
-//         try {
-//             const initialGuessRequest: WordleRequest = [];
-//             const initialGuessResponse: WordleResponse = await fetchWordleResult(
-//                 initialGuessRequest
-//             );
-//             const initialGuess: string = initialGuessResponse.guess;
-
-//             // Do something with the initial guess
-//             console.log("Initial Guess:", initialGuess);
-//         } catch (error) {
-//             console.error("Error loading initial guess:", error);
-//         }
-//     };
-
-//     // Call the function to load the initial guess
-//     loadInitialGuess();
-
-    return <div>WordToGuess</div>;
+interface IWordToGuessProps {
+    userRequestItem: { word: string; clue: string }[];
 }
+
+const WordToGuess: React.FC<IWordToGuessProps> = ({ userRequestItem }) => {
+    return (
+        <>
+            <div className="wordToGuess-container">
+                <h2>Guess #{userRequestItem.length}</h2>
+                <br />
+                <div className="guess" style={{ display: "flex" }}>
+                    <span style={{ fontWeight: "500", fontSize: "1.3rem" }}>Word to guess:</span>
+                    {userRequestItem.map((item, index) => (
+                        <div className="word-to-guess" key={index}>
+                            {item.word.split("").map((letter, letterIndex) => (
+                                <span
+                                    style={{
+                                        margin: ".8rem",
+                                        padding: "1.3rem",
+                                        outline: "1px solid black",
+                                    }}
+                                    key={letterIndex}
+                                >
+                                    {letter.toLocaleUpperCase()}
+                                </span>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </>
+    );
+};
 
 export default WordToGuess;

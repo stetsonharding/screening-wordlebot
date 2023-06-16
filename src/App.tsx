@@ -1,7 +1,8 @@
 import { Container } from "@mui/material";
 import Layout from "./components/Layout";
 import Header from "./components/Header";
-import WordToGuess from "./components/WordToGuess";
+
+import UsersGuessesContainer from "./components/UsersGuessesContainer";
 
 function App() {
     return (
@@ -9,7 +10,7 @@ function App() {
             <Container maxWidth="sm">
                 <Header />
                 {/* Insert App here */}
-                <WordToGuess />
+                <UsersGuessesContainer />
             </Container>
         </Layout>
     );
