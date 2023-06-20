@@ -15,6 +15,8 @@ function UsersGuessesContainer() {
         { id: 1, word: "", clue: "" },
     ]);
 
+    console.log(userRequestItem);
+
     const loadInitialGuess = async () => {
         try {
             const initialGuessRequest: WordleRequest = [];
@@ -42,9 +44,11 @@ function UsersGuessesContainer() {
                         <h2>Guess #{index + 1}</h2>
                         <WordToGuess userRequestItem={item.word} key={index} />
                         <h4 style={{ marginTop: "2.5rem" }}>What response did you get back?</h4>
+
                         <ClueInput
                             setUserRequestItem={setUserRequestItem}
                             userRequestItem={userRequestItem}
+                            userRequestItemWord={item.word}
                         />
                     </div>
                 ) : (

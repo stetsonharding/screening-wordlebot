@@ -2,16 +2,18 @@ import React, { useState, ChangeEvent, useEffect } from "react";
 import { fetchWordleResult, WordleRequestItem } from "../api/api";
 
 import { IRequestItem } from "./UsersGuessesContainer";
-import WordToGuess from "./WordToGuess";
+import WordleResponse from "./WordleResponse";
+// import WordToGuess from "./WordToGuess";
 
 interface IClueInputProps {
     setUserRequestItem: React.Dispatch<
         React.SetStateAction<{ id: number; word: string; clue: string }[]>
     >;
     userRequestItem: IRequestItem[] | [];
+    userRequestItemWord: string;
 }
 
-function ClueInput({ setUserRequestItem, userRequestItem }: IClueInputProps) {
+function ClueInput({ setUserRequestItem, userRequestItem, userRequestItemWord }: IClueInputProps) {
     const [isClueInputShown, setIsClueInputShown] = useState(false);
     const [inputClue, setInputClue] = useState("");
 
@@ -23,6 +25,7 @@ function ClueInput({ setUserRequestItem, userRequestItem }: IClueInputProps) {
         e.preventDefault();
 
         setUserRequestItem((prevState) => [
+            ...prevState.slice(0, prevState.length - 1),
             {
                 ...prevState[prevState.length - 1],
                 clue: inputClue,
@@ -33,28 +36,33 @@ function ClueInput({ setUserRequestItem, userRequestItem }: IClueInputProps) {
         setIsClueInputShown(false);
     };
 
-    if (userRequestItem[userRequestItem.length - 1].clue !== "") {
-        const requestItem: WordleRequestItem = {
-            word: userRequestItem[userRequestItem.length - 1].word,
-            clue: userRequestItem[userRequestItem.length - 1].clue,
-        };
-        fetchWordleResult([requestItem])
-            .then((result) => {
-                const guess = result.guess;
+    useEffect(() => {
+        const FetchNewWord = () => {
+            if (userRequestItem[userRequestItem.length - 1].clue !== "") {
+                const requestItem: WordleRequestItem = {
+                    word: userRequestItem[userRequestItem.length - 1].word,
+                    clue: userRequestItem[userRequestItem.length - 1].clue,
+                };
+                fetchWordleResult([requestItem])
+                    .then((result) => {
+                        const guess = result.guess;
 
-                setUserRequestItem((prevState) => [
-                    ...prevState,
-                    {
-                        id: prevState.length + 1,
-                        word: guess,
-                        clue: "",
-                    },
-                ]);
-            })
-            .catch((error) => {
-                console.error("Error fetching wordle result:", error);
-            });
-    }
+                        setUserRequestItem((prevState) => [
+                            ...prevState,
+                            {
+                                id: prevState.length + 1,
+                                word: guess,
+                                clue: "",
+                            },
+                        ]);
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching wordle result:", error);
+                    });
+            }
+        };
+        FetchNewWord();
+    }, [userRequestItem, setUserRequestItem]);
 
     return (
         <div style={{ marginTop: "1.1rem" }}>
@@ -67,6 +75,9 @@ function ClueInput({ setUserRequestItem, userRequestItem }: IClueInputProps) {
                     <input type="text" placeholder="Add Clue Here" onChange={handleInput} />
                     <button type="submit">Submit</button>
                 </form>
+            )}
+            {inputClue !== "" && isClueInputShown === false && (
+                <WordleResponse userRequestItemWord={userRequestItemWord} inputClue={inputClue} />
             )}
         </div>
     );
