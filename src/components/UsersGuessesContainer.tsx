@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from "react";
 import WordToGuess from "./WordToGuess";
 import CircularProgress from "@mui/material/CircularProgress";
-import { fetchWordleResult, WordleRequest, WordleResponse } from "../api/api";
+import { fetchWordleResult, WordleRequest, WordleRequestItem, WordleResponse } from "../api/api";
+import ClueInput from "./ClueInput";
+
+export interface IRequestItem {
+    id: number;
+    word: string;
+    clue: string;
+}
 
 function UsersGuessesContainer() {
-    const [userRequestItem, setUserRequestItem] = useState([{ id: 1, word: "", clue: "" }]);
+    const [userRequestItem, setUserRequestItem] = useState<IRequestItem[]>([
+        { id: 1, word: "", clue: "" },
+    ]);
 
-    // Call the fetchWordleResult function to load an initial guess
     const loadInitialGuess = async () => {
         try {
             const initialGuessRequest: WordleRequest = [];
@@ -15,7 +23,7 @@ function UsersGuessesContainer() {
             );
             const initialGuess: string = initialGuessResponse.guess;
 
-            //save inital guess in state
+            // Save initial guess in state
             setUserRequestItem([{ id: 1, word: initialGuess, clue: "" }]);
         } catch (error) {
             console.error("Error loading initial guess:", error);
@@ -27,25 +35,32 @@ function UsersGuessesContainer() {
     }, []);
 
     return (
-        <div
-            className="guesses-container"
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "column",
-                marginTop: "2rem",
-            }}
-        >
+        <div className="guesses-container">
             {userRequestItem.map((item, index) =>
                 item.word ? (
-                    <>
-                        <WordToGuess userRequestItem={userRequestItem} key={index} />
-                    </>
+                    <div key={item.id}>
+                        <h2>Guess #{index + 1}</h2>
+                        <WordToGuess userRequestItem={item.word} key={index} />
+                        <h4 style={{ marginTop: "2.5rem" }}>What response did you get back?</h4>
+                        <ClueInput
+                            setUserRequestItem={setUserRequestItem}
+                            userRequestItem={userRequestItem}
+                        />
+                    </div>
                 ) : (
-                    <CircularProgress key={item.id} />
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            marginTop: "2rem",
+                        }}
+                    >
+                        <CircularProgress />
+                    </div>
                 )
             )}
+            <div></div>
         </div>
     );
 }
