@@ -15,8 +15,6 @@ function UsersGuessesContainer() {
         { id: 1, word: "", clue: "" },
     ]);
 
-    console.log(userRequestItem);
-
     const loadInitialGuess = async () => {
         try {
             const initialGuessRequest: WordleRequest = [];

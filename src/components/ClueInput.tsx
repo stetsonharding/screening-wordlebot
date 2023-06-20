@@ -36,6 +36,7 @@ function ClueInput({ setUserRequestItem, userRequestItem, userRequestItemWord }:
         setIsClueInputShown(false);
     };
 
+    console.log(userRequestItem);
     useEffect(() => {
         const FetchNewWord = () => {
             if (userRequestItem[userRequestItem.length - 1].clue !== "") {
@@ -77,7 +78,10 @@ function ClueInput({ setUserRequestItem, userRequestItem, userRequestItemWord }:
                 </form>
             )}
             {inputClue !== "" && isClueInputShown === false && (
-                <WordleResponse userRequestItemWord={userRequestItemWord} inputClue={inputClue} />
+                <WordleResponse
+                    userRequestItemWord={userRequestItemWord}
+                    inputClue={inputClue.toUpperCase()}
+                />
             )}
         </div>
     );

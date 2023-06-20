@@ -13,6 +13,10 @@ function WordleResponse({ userRequestItemWord, inputClue }: IWordleResponseProps
                     <p
                         style={{
                             margin: "1rem",
+                            fontSize: "1.3rem",
+                            outline: "1px solid black",
+                            padding: "1rem",
+
                             backgroundColor:
                                 inputClue[index] === "G"
                                     ? "green"
