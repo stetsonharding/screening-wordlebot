@@ -1,9 +1,7 @@
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { fetchWordleResult, WordleRequestItem } from "../api/api";
-
 import { IRequestItem } from "./UsersGuessesContainer";
 import WordleResponse from "./WordleResponse";
-// import WordToGuess from "./WordToGuess";
 
 interface IClueInputProps {
     setUserRequestItem: React.Dispatch<
@@ -11,43 +9,50 @@ interface IClueInputProps {
     >;
     userRequestItem: IRequestItem[] | [];
     userRequestItemWord: string;
+    userRequestGuess: IRequestItem;
 }
 
-function ClueInput({ setUserRequestItem, userRequestItem, userRequestItemWord }: IClueInputProps) {
+function ClueInput({
+    setUserRequestItem,
+    userRequestItem,
+    userRequestItemWord,
+    userRequestGuess,
+}: IClueInputProps) {
     const [isClueInputShown, setIsClueInputShown] = useState(false);
     const [inputClue, setInputClue] = useState("");
+
+    console.log(userRequestGuess);
 
     const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
         setInputClue(e.target.value);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent, id: number) => {
         e.preventDefault();
+        let newRequest = userRequestItem.map((item) => {
+            if (item.id === id) {
+                return { ...item, clue: inputClue };
+            }
+            return item;
+        });
 
-        setUserRequestItem((prevState) => [
-            ...prevState.slice(0, prevState.length - 1),
-            {
-                ...prevState[prevState.length - 1],
-                clue: inputClue,
-            },
-        ]);
+        setUserRequestItem(newRequest);
 
         // Hide the clue input
         setIsClueInputShown(false);
     };
 
-    console.log(userRequestItem);
     useEffect(() => {
         const FetchNewWord = () => {
-            if (userRequestItem[userRequestItem.length - 1].clue !== "") {
+            const lastItem = userRequestItem[userRequestItem.length - 1];
+            if (lastItem.clue !== "" && lastItem.id === userRequestGuess.id) {
                 const requestItem: WordleRequestItem = {
-                    word: userRequestItem[userRequestItem.length - 1].word,
-                    clue: userRequestItem[userRequestItem.length - 1].clue,
+                    word: lastItem.word,
+                    clue: lastItem.clue,
                 };
                 fetchWordleResult([requestItem])
                     .then((result) => {
                         const guess = result.guess;
-
                         setUserRequestItem((prevState) => [
                             ...prevState,
                             {
@@ -63,7 +68,7 @@ function ClueInput({ setUserRequestItem, userRequestItem, userRequestItemWord }:
             }
         };
         FetchNewWord();
-    }, [userRequestItem, setUserRequestItem]);
+    }, [userRequestItem, setUserRequestItem, userRequestGuess]);
 
     return (
         <div style={{ marginTop: "1.1rem" }}>
@@ -72,7 +77,7 @@ function ClueInput({ setUserRequestItem, userRequestItem, userRequestItemWord }:
             </span>
             <br />
             {isClueInputShown && (
-                <form id="form" onSubmit={handleSubmit}>
+                <form id="form" onSubmit={(e) => handleSubmit(e, userRequestGuess.id)}>
                     <input type="text" placeholder="Add Clue Here" onChange={handleInput} />
                     <button type="submit">Submit</button>
                 </form>

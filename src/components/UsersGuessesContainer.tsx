@@ -46,6 +46,7 @@ function UsersGuessesContainer() {
                         <ClueInput
                             setUserRequestItem={setUserRequestItem}
                             userRequestItem={userRequestItem}
+                            userRequestGuess={item}
                             userRequestItemWord={item.word}
                         />
                     </div>
