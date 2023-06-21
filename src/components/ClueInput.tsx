@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, useEffect } from "react";
 import { fetchWordleResult, WordleRequestItem } from "../api/api";
 import { IRequestItem } from "./UsersGuessesContainer";
 import WordleResponse from "./WordleResponse";
+import CircularProgress from "@mui/material/CircularProgress";
 
 interface IClueInputProps {
     setUserRequestItem: React.Dispatch<
@@ -22,6 +23,7 @@ function ClueInput({
     const [isClueInputShown, setIsClueInputShown] = useState(false);
     const [inputClue, setInputClue] = useState("");
     const [error, setError] = useState("");
+    const [loadingNewWord, setLoadingNewWord] = useState(false);
 
     //Get the value from the Input from the user
     const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
@@ -46,9 +48,10 @@ function ClueInput({
 
         // Update the state of userRequestItem with the new array
         setUserRequestItem(newRequest);
-
         // Set the state of isClueInputShown to false to hide the clue input
         setIsClueInputShown(false);
+        //let user know a call is being made to server
+        setLoadingNewWord(true);
     };
 
     useEffect(() => {
@@ -67,12 +70,14 @@ function ClueInput({
                     word: lastItem.word,
                     clue: lastItem.clue,
                 };
-
                 // Fetch result using the request item
                 fetchWordleResult([requestItem])
                     .then((result) => {
                         // saving guess from the result
                         const guess = result.guess;
+
+                        //Turn off loading wheel beacuse we have the result
+                        setLoadingNewWord(false);
 
                         //  add new item with the word as the guess and empty clue for user to store the next wordle result in.
                         setUserRequestItem((prevState) => [
@@ -83,6 +88,7 @@ function ClueInput({
                                 clue: "",
                             },
                         ]);
+                        // setLoadingNewWord(false);
                     })
                     .catch((error) => {
                         // Handling errors
@@ -93,6 +99,8 @@ function ClueInput({
 
         FetchNewWord();
     }, [userRequestItem, setUserRequestItem, userRequestGuess]);
+
+    console.log(loadingNewWord);
 
     return (
         <div style={{ marginTop: "1.1rem" }}>
@@ -117,6 +125,7 @@ function ClueInput({
                     inputClue={inputClue.toUpperCase()}
                 />
             )}
+            {loadingNewWord === true && <CircularProgress />}
             {/* Displaying errors to user */}
             {error && <p style={{ color: "red" }}>{error}</p>}
         </div>
