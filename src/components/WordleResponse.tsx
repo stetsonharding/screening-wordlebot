@@ -8,15 +8,17 @@ interface IWordleResponseProps {
 function WordleResponse({ userRequestItemWord, inputClue }: IWordleResponseProps) {
     return (
         <div style={{ display: "flex" }}>
-            {userRequestItemWord.split("").map((item, index) => {
-                return (
+            {inputClue === "GGGGG" ? (
+                <span>You win!</span>
+            ) : (
+                userRequestItemWord.split("").map((item, index) => (
                     <p
+                        key={index}
                         style={{
                             margin: "1rem",
                             fontSize: "1.3rem",
                             outline: "1px solid black",
                             padding: "1rem",
-
                             backgroundColor:
                                 inputClue[index] === "G"
                                     ? "green"
@@ -27,8 +29,8 @@ function WordleResponse({ userRequestItemWord, inputClue }: IWordleResponseProps
                     >
                         {item}
                     </p>
-                );
-            })}
+                ))
+            )}
         </div>
     );
 }

@@ -14,9 +14,10 @@ const WordToGuess: React.FC<IWordToGuessProps> = ({ userRequestItem }) => {
             }}
         >
             <span style={{ fontWeight: "500", fontSize: "1.3rem" }}>Word to guess:</span>
-            {userRequestItem.split("").map((char) => {
+            {userRequestItem.split("").map((char, index) => {
                 return (
                     <p
+                        key={index}
                         style={{
                             margin: "1rem",
                             fontSize: "1.3rem",

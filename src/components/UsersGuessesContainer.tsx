@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import WordToGuess from "./WordToGuess";
 import CircularProgress from "@mui/material/CircularProgress";
-import { fetchWordleResult, WordleRequest, WordleRequestItem, WordleResponse } from "../api/api";
+import { fetchWordleResult, WordleRequest, WordleResponse } from "../api/api";
 import ClueInput from "./ClueInput";
 
 export interface IRequestItem {
@@ -35,7 +35,7 @@ function UsersGuessesContainer() {
     }, []);
 
     return (
-        <div className="guesses-container">
+        <div className="guesses-container" style={{ overflow: "auto", height: "85vh" }}>
             {userRequestItem.map((item, index) =>
                 item.word ? (
                     <div key={item.id}>
@@ -52,6 +52,7 @@ function UsersGuessesContainer() {
                     </div>
                 ) : (
                     <div
+                        key={item.id}
                         style={{
                             display: "flex",
                             justifyContent: "center",
@@ -63,7 +64,6 @@ function UsersGuessesContainer() {
                     </div>
                 )
             )}
-            <div></div>
         </div>
     );
 }

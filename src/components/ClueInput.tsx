@@ -18,41 +18,63 @@ function ClueInput({
     userRequestItemWord,
     userRequestGuess,
 }: IClueInputProps) {
+    //State for input and hide/show form
     const [isClueInputShown, setIsClueInputShown] = useState(false);
     const [inputClue, setInputClue] = useState("");
+    const [error, setError] = useState("");
 
-    console.log(userRequestGuess);
-
+    //Get the value from the Input from the user
     const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
-        setInputClue(e.target.value);
+        setInputClue(e.target.value.toUpperCase());
     };
 
     const handleSubmit = (e: React.FormEvent, id: number) => {
+        // Prevent the default form submission behavior
         e.preventDefault();
+
+        // Create a new array by mapping over the userRequestItem
         let newRequest = userRequestItem.map((item) => {
+            // Check if the current items id matches the provided id
             if (item.id === id) {
+                // If a match is found create a new object with the same properties as the item,
+                // but with the 'clue' property updated to the value of inputClue
                 return { ...item, clue: inputClue };
             }
+            //no match is found, return the original item with nothing changed
             return item;
         });
 
+        // Update the state of userRequestItem with the new array
         setUserRequestItem(newRequest);
 
-        // Hide the clue input
+        // Set the state of isClueInputShown to false to hide the clue input
         setIsClueInputShown(false);
     };
 
     useEffect(() => {
+        // Function to fetch a new word
         const FetchNewWord = () => {
+            // Get the last item from the userRequestItem array
             const lastItem = userRequestItem[userRequestItem.length - 1];
-            if (lastItem.clue !== "" && lastItem.id === userRequestGuess.id) {
+            // Check if the last item has a clue, matches the userRequestGuess id, and the inputClue is not "GGGGG"
+            if (
+                lastItem.clue !== "" &&
+                lastItem.id === userRequestGuess.id &&
+                inputClue !== "GGGGG"
+            ) {
+                // Create a request item with the word and clue from the last item
                 const requestItem: WordleRequestItem = {
                     word: lastItem.word,
                     clue: lastItem.clue,
                 };
+
+                // Fetch result using the request item
                 fetchWordleResult([requestItem])
                     .then((result) => {
+                        // saving guess from the result
                         const guess = result.guess;
+
+                        //  add new item with the word as the guess and empty clue for user to store the next wordle result in.
                         setUserRequestItem((prevState) => [
                             ...prevState,
                             {
@@ -63,31 +85,40 @@ function ClueInput({
                         ]);
                     })
                     .catch((error) => {
-                        console.error("Error fetching wordle result:", error);
+                        // Handling errors
+                        setError(error.message);
                     });
             }
         };
+
         FetchNewWord();
     }, [userRequestItem, setUserRequestItem, userRequestGuess]);
 
     return (
         <div style={{ marginTop: "1.1rem" }}>
-            <span style={{ cursor: "pointer" }} onClick={() => setIsClueInputShown(true)}>
-                Add clue
-            </span>
-            <br />
+            {/* Only render the 'add clue' button for the last item in the userRequestItem array */}
+            {userRequestItem[userRequestItem.length - 1] === userRequestGuess && (
+                <span style={{ cursor: "pointer" }} onClick={() => setIsClueInputShown(true)}>
+                    Add clue
+                </span>
+            )}
+            {/* == */}
+            {/* Show the form when user clicks the 'add clue' button */}
             {isClueInputShown && (
                 <form id="form" onSubmit={(e) => handleSubmit(e, userRequestGuess.id)}>
                     <input type="text" placeholder="Add Clue Here" onChange={handleInput} />
-                    <button type="submit">Submit</button>
+                    <button type="submit">submit</button>
                 </form>
             )}
+            {/* Render the input clue for the user if they entered one */}
             {inputClue !== "" && isClueInputShown === false && (
                 <WordleResponse
                     userRequestItemWord={userRequestItemWord}
                     inputClue={inputClue.toUpperCase()}
                 />
             )}
+            {/* Displaying errors to user */}
+            {error && <p style={{ color: "red" }}>{error}</p>}
         </div>
     );
 }
